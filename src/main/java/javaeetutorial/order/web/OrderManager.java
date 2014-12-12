@@ -1,9 +1,11 @@
 
 package javaeetutorial.order.web;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javaeetutorial.order.ejb.RequestBean;
@@ -40,6 +42,22 @@ public class OrderManager implements Serializable{
     private Long selectedVendorPartNumber;
     private Boolean findVendorTableDisabled = false;
     private Boolean partsTableDisabled = true;
+    private String url;
+
+
+      
+
+
+    
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    private String partNumber;
 
     /**
      * @return the orders
@@ -71,6 +89,19 @@ public class OrderManager implements Serializable{
         } catch (NumberFormatException e) {
         }
     }
+    
+    public void removeLineItem(ActionEvent event){
+        try{
+            UIParameter param = (UIParameter) event.getComponent().findComponent("deleteLineItem");
+            Integer id = Integer.parseInt(param.getValue().toString());
+            request.removeLineItem(id);
+            logger.log(Level.INFO, "Removed lineItem {0}.", id); 
+            
+        }catch (NumberFormatException e) {
+            
+        }
+ 
+    }
 
     public void findVendor() {
         try {
@@ -97,6 +128,15 @@ public class OrderManager implements Serializable{
             this.newOrderShippingInfo = null;
         } catch (Exception e) {
             logger.warning("Problem creating order in submitOrder.");
+        }
+    }
+    
+    public void addPicture() {
+        try {
+            request.createPart(this.selectedPartNumber, 1, "ABC PART",
+                new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", "/resources/images/" + this.url);
+        } catch (Exception e){
+            logger.warning("Problem ze stworzeniem propozycji skanu.");
         }
     }
 

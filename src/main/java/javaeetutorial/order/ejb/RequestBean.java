@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javaeetutorial.order.entity.CustomerOrder;
 import javaeetutorial.order.entity.LineItem;
+import javaeetutorial.order.entity.LineItemKey;
 import javaeetutorial.order.entity.Part;
 import javaeetutorial.order.entity.PartKey;
 import javaeetutorial.order.entity.Vendor;
@@ -269,6 +270,16 @@ public class RequestBean {
         } catch (Exception e) {
             throw new EJBException(e.getMessage());
         }
+    }
+    
+    public void removeLineItem(Integer partNumber) {
+        try{
+            Part part = em.find(Part.class, partNumber);
+            em.remove(part);
+        } catch (Exception e) {
+            throw new EJBException(e.getMessage());
+        }
+        
     }
     
     public String reportVendorsByOrder(Integer orderId) {

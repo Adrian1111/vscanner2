@@ -5,6 +5,26 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html">
     <h:head>
+        <script src="resources/lightbox/js/jquery-1.11.0.min.js"></script>
+	<script src="resources/lightbox/js/lightbox.min.js"></script>
+        <link href="resources/lightbox/css/lightbox.css" rel="stylesheet" />
+<script type="text/javascript">
+
+    function zoomIt(it) {
+        
+        if(it.width === 50 ){
+        it.width *= "10";
+        it.height *= "10";
+        //alert(drawing);
+    }
+    else{
+        it.width = "50";
+        it.height = "50";
+    }
+       
+       
+    }
+</script>
         <title>Order Persistence Example</title>
         <h:outputStylesheet library="css" name="default.css"/>
     </h:head>
