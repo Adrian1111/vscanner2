@@ -1,4 +1,3 @@
-
 package javaeetutorial.order.web;
 
 import java.io.IOException;
@@ -13,16 +12,22 @@ import javaeetutorial.order.entity.CustomerOrder;
 import javaeetutorial.order.entity.LineItem;
 import javaeetutorial.order.entity.Part;
 import javax.ejb.EJB;
-import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIParameter;
 import javax.faces.event.ActionEvent;
 
 
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
+ 
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.UploadedFile;
 
 @ManagedBean
 @SessionScoped
-public class OrderManager implements Serializable{
+public class OrderManager implements Serializable {
+
     private static final long serialVersionUID = 2142383151318489373L;
     @EJB
     private RequestBean request;
@@ -43,12 +48,21 @@ public class OrderManager implements Serializable{
     private Boolean findVendorTableDisabled = false;
     private Boolean partsTableDisabled = true;
     private String url;
+    private UploadedFile file;
 
+    public void handleFileUpload(FileUploadEvent event) {
+        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+    }
 
-      
+    public UploadedFile getFile() {
+        return file;
+    }
 
+    public void setFile(UploadedFile file) {
+        this.file = file;
+    }
 
-    
     public String getUrl() {
         return url;
     }
@@ -56,7 +70,7 @@ public class OrderManager implements Serializable{
     public void setUrl(String url) {
         this.url = url;
     }
-    
+
     private String partNumber;
 
     /**
@@ -89,25 +103,25 @@ public class OrderManager implements Serializable{
         } catch (NumberFormatException e) {
         }
     }
-    
-    public void removeLineItem(ActionEvent event){
-        try{
+
+    public void removeLineItem(ActionEvent event) {
+        try {
             UIParameter param = (UIParameter) event.getComponent().findComponent("deleteLineItem");
             Integer id = Integer.parseInt(param.getValue().toString());
             request.removeLineItem(id);
-            logger.log(Level.INFO, "Removed lineItem {0}.", id); 
-            
-        }catch (NumberFormatException e) {
-            
+            logger.log(Level.INFO, "Removed lineItem {0}.", id);
+
+        } catch (NumberFormatException e) {
+
         }
- 
+
     }
 
     public void findVendor() {
         try {
             this.findVendorTableDisabled = true;
             this.vendorSearchResults = (List<String>) request.locateVendorsByPartialName(vendorName);
-            logger.log(Level.INFO, "Znaleziono {0} prawników używając stringa {1}.", 
+            logger.log(Level.INFO, "Znaleziono {0} prawników używając stringa {1}.",
                     new Object[]{vendorSearchResults.size(), vendorName});
         } catch (Exception e) {
             logger.warning("Problem z wywołaniem RequestBean.locateVendorsByPartialName z findVendor");
@@ -120,7 +134,7 @@ public class OrderManager implements Serializable{
                     newOrderShippingInfo);
 
             logger.log(Level.INFO, "Created new order with order ID {0}, status {1}, "
-                    + "discount {2}, and shipping info {3}.", 
+                    + "discount {2}, and shipping info {3}.",
                     new Object[]{newOrderId, newOrderStatus, newOrderDiscount, newOrderShippingInfo});
             this.newOrderId = null;
             this.newOrderDiscount = 0;
@@ -130,12 +144,12 @@ public class OrderManager implements Serializable{
             logger.warning("Problem creating order in submitOrder.");
         }
     }
-    
+
     public void addPicture() {
         try {
             request.createPart(this.selectedPartNumber, 1, "ABC PART",
-                new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", "/resources/images/" + this.url);
-        } catch (Exception e){
+                    new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", "/resources/images/" + this.url);
+        } catch (Exception e) {
             logger.warning("Problem ze stworzeniem propozycji skanu.");
         }
     }
@@ -143,17 +157,17 @@ public class OrderManager implements Serializable{
     public void addLineItem() {
         try {
             List<LineItem> lineItems = request.getLineItems(currentOrder);
-            logger.log(Level.INFO, "There are {0} line items in {1}.", 
+            logger.log(Level.INFO, "There are {0} line items in {1}.",
                     new Object[]{lineItems.size(), currentOrder});
             request.addLineItem(this.currentOrder,
                     this.selectedPartNumber,
                     this.selectedPartRevision,
                     1);
-            logger.log(Level.INFO, "Adding line item to order # {0}", 
+            logger.log(Level.INFO, "Adding line item to order # {0}",
                     this.currentOrder);
             //this.clearSelected();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Problem adding line items to order ID {0}", 
+            logger.log(Level.WARNING, "Problem adding line items to order ID {0}",
                     newOrderId);
         }
     }
