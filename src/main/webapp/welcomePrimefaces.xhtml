@@ -5,6 +5,25 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
 
+
+<script type="text/javascript">
+
+    function zoomIt(it) {
+        
+        if(it.width === 50 ){
+        it.width *= "10";
+        it.height *= "10";
+        //alert(drawing);
+    }
+    else{
+        it.width = "50";
+        it.height = "50";
+    }
+       
+       
+    }
+</script>
+
     <f:view contentType="text/html">
         <h:head>
             <f:facet name="first">
@@ -12,49 +31,124 @@
                 <title>PrimeFaces</title>
             </f:facet>
         </h:head>
-
+        <ui:define name="title">Dodaj skany sprawy #{orderManager.currentOrder}</ui:define>
         <h:body>
 
 
 
-            <p:layout fullPage="true">
 
-                <p:layoutUnit position="north" size="100" resizable="true" closable="true" collapsible="true">
-                    Header
-                </p:layoutUnit>
+            <h:form>
+                <h:dataTable var="lineItem"
+                             summary="Wykaz skanów"
+                             value="#{orderManager.lineItems}"
+                             rules="all"
+                             cellpadding="5">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Numer skanu" />
+                        </f:facet>
+                        <h:outputText value="#{lineItem.itemId}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Podgląd" />
+                        </f:facet>
+                        <h:graphicImage  value="#{part.drawing}" width="50" height="50" onclick = "zoomIt(this)"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="ID osoby dodającej" />
+                        </f:facet>
+                        <h:outputText value="#{lineItem.vendorPart.vendorPartNumber}" />
+                    </h:column>
+                </h:dataTable>
+                <br />
 
-                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
-                    Footer
-                </p:layoutUnit>
+                <h:dataTable id="orderPartsTable"
+                             summary="Wykaz skanów"
+                             value="#{orderManager.newOrderParts}"
+                             var="part"
+                             rules="all"
+                             cellpadding="5">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Nazwa skanu" />
+                        </f:facet>
+                        <h:outputText value="#{part.partNumber}" />
+                    </h:column>
 
-                <p:layoutUnit position="west" size="175" header="Left" collapsible="true">
-                    <p:menu>
-                        <p:submenu label="Resources">
-                            <p:menuitem value="Demo" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
-                            <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" />
-                            <p:menuitem value="Forum" url="http://forum.primefaces.org/" />
-                            <p:menuitem value="Themes" url="http://www.primefaces.org/themes.html" />
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="ID osoby dodającej" />
+                        </f:facet>
+                        <h:outputText value="#{part.vendorPart.vendorPartNumber}" />
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Rysunek" />
+                        </f:facet>
+                        <h:graphicImage  value="#{part.drawing}" width="50" height="50" onclick = "zoomIt(this)"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Dodaj do sprawy" />
+                        </f:facet>
+                        <h:commandButton value="Dodaj" action="#{orderManager.addLineItem}">
+                            <f:setPropertyActionListener target="#{orderManager.selectedPartNumber}" value="#{part.partNumber}" />
+                            <f:setPropertyActionListener target="#{orderManager.selectedPartRevision}" value="#{part.revision}" />
+                            <f:setPropertyActionListener target="#{orderManager.selectedVendorPartNumber}" value="#{part.vendorPart.vendorPartNumber}" />
+                        </h:commandButton>
 
-                        </p:submenu>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Akcje" />
+                        </f:facet>
+                        <h:form>
+                            <h:commandLink value="Usuń" actionListener="#{orderManager.removeLineItem}" action="lineItem">
+                                <f:param name="deleteItemId" id="deleteItemId" value="#{part.partNumber}" />
+                            </h:commandLink>
+                        </h:form>
 
-                    </p:menu>
-                </p:layoutUnit>
+                    </h:column>
+                </h:dataTable>
+                <br />
 
-                <p:layoutUnit position="center">
-                    Welcome to PrimeFaces
-                    
-                                <h:form>
-                <p:fileUpload fileUploadListener="#{fileUploadView.handleFileUpload}" mode="advanced" dragDropSupport="false"
+
+
+            </h:form>
+
+            <!--            <h:form id="form" enctype="multipart/form-data">
+                            <h:column>
+            
+                                <h:inputFile value="Wrzuć plik" />
+                                <h:inputText value="{orderManager.url}" />
+                                <h:commandButton value="Dodaj obrazek" action="{orderManager.addPicture}"/>
+            
+            
+                            </h:column>
+            
+                        </h:form>-->
+
+
+            <h:form>
+
+                <br />
+                <h:commandButton value="Powrót do menu" action="vscanner" />
+                
+            </h:form>
+
+
+            <h:form>
+                <p:fileUpload fileUploadListener="#{orderManager.handleFileUpload}" mode="advanced" dragDropSupport="false"
                               update="messages" sizeLimit="100000" fileLimit="3" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
 
                 <p:growl id="messages" showDetail="true" />
             </h:form>
-                </p:layoutUnit>
-
-            </p:layout>
 
         </h:body>
 
     </f:view>
+
 </html>
 
