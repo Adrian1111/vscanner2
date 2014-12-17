@@ -51,9 +51,14 @@ public class OrderManager implements Serializable {
     private UploadedFile file;
 
     public void handleFileUpload(FileUploadEvent event) {
-        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        try{
+            request.handleFileUpload(event);
+        }
+        catch (Exception e){
+            logger.warning("Nie moge uploadowac pliku");
     }
+    }
+    
 
     public UploadedFile getFile() {
         return file;
@@ -104,6 +109,8 @@ public class OrderManager implements Serializable {
         }
     }
 
+    
+    //cos jeszcze jest nie tak jak powinno poprawic
     public void removeLineItem(ActionEvent event) {
         try {
             UIParameter param = (UIParameter) event.getComponent().findComponent("deleteLineItem");

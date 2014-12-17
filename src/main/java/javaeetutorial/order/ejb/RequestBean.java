@@ -1,4 +1,3 @@
-
 package javaeetutorial.order.ejb;
 
 import java.io.Serializable;
@@ -17,18 +16,30 @@ import javaeetutorial.order.entity.Vendor;
 import javaeetutorial.order.entity.VendorPart;
 import javax.ejb.EJBException;
 import javax.ejb.Stateful;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-
+import org.primefaces.event.FileUploadEvent;
 
 @Stateful
 public class RequestBean {
-    
+
     @PersistenceContext
     private EntityManager em;
 
     private static final Logger logger = Logger.getLogger("order.ejb.RequestBean");
-    
+
+    public void handleFileUpload(FileUploadEvent event) {
+        try {
+            FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        } catch (Exception e) {
+            throw new EJBException(e.getMessage());
+        }
+
+    }
+
     public void createPart(String partNumber,
             int revision,
             String description,
@@ -67,14 +78,14 @@ public class RequestBean {
             PartKey bomKey = new PartKey();
             bomKey.setPartNumber(bomPartNumber);
             bomKey.setRevision(bomRevision);
-            
+
             Part bom = em.find(Part.class, bomKey);
             logger.log(Level.INFO, "BOM Part found: {0}", bom.getPartNumber());
-            
+
             PartKey partKey = new PartKey();
             partKey.setPartNumber(partNumber);
             partKey.setRevision(revision);
-            
+
             Part part = em.find(Part.class, partKey);
             logger.log(Level.INFO, "Part found: {0}", part.getPartNumber());
             bom.getParts().add(part);
@@ -82,7 +93,7 @@ public class RequestBean {
         } catch (EJBException e) {
         }
     }
-    
+
     public void createVendor(int vendorId,
             String name,
             String address,
@@ -95,7 +106,7 @@ public class RequestBean {
             throw new EJBException(e);
         }
     }
-    
+
     public void createVendorPart(String partNumber,
             int revision,
             String description,
@@ -105,12 +116,12 @@ public class RequestBean {
             PartKey pkey = new PartKey();
             pkey.setPartNumber(partNumber);
             pkey.setRevision(revision);
-            
+
             Part part = em.find(Part.class, pkey);
-            
+
             VendorPart vendorPart = new VendorPart(description, price, part);
             em.persist(vendorPart);
-            
+
             Vendor vendor = em.find(Vendor.class, vendorId);
             vendor.addVendorPart(vendorPart);
             vendorPart.setVendor(vendor);
@@ -118,7 +129,7 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public void createOrder(Integer orderId, char status, int discount, String shipmentInfo) {
         try {
             CustomerOrder order = new CustomerOrder(orderId, status, discount, shipmentInfo);
@@ -135,18 +146,18 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public void addLineItem(Integer orderId, String partNumber, int revision, int quantity) {
         try {
             CustomerOrder order = em.find(CustomerOrder.class, orderId);
             logger.log(Level.INFO, "Found order ID {0}", orderId);
-            
+
             PartKey pkey = new PartKey();
             pkey.setPartNumber(partNumber);
             pkey.setRevision(revision);
-            
+
             Part part = em.find(Part.class, pkey);
-            
+
             LineItem lineItem = new LineItem(order, quantity, part.getVendorPart());
             order.addLineItem(lineItem);
         } catch (Exception e) {
@@ -154,27 +165,27 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public double getBillOfMaterialPrice(String bomPartNumber, int bomRevision, String partNumber, int revision) {
         double price = 0.0;
         try {
             PartKey bomkey = new PartKey();
             bomkey.setPartNumber(bomPartNumber);
             bomkey.setRevision(bomRevision);
-            
+
             Part bom = em.find(Part.class, bomkey);
             Collection<Part> parts = bom.getParts();
             for (Part part : parts) {
                 VendorPart vendorPart = part.getVendorPart();
                 price += vendorPart.getPrice();
             }
-            
+
         } catch (Exception e) {
             throw new EJBException(e.getMessage());
         }
         return price;
     }
-    
+
     public double getOrderPrice(Integer orderId) {
         double price = 0.0;
         try {
@@ -185,22 +196,22 @@ public class RequestBean {
         }
         return price;
     }
-    
+
     public void adjustOrderDiscount(int adjustment) {
         try {
             List orders = em.createNamedQuery(
                     "findAllOrders")
                     .getResultList();
             for (Iterator it = orders.iterator(); it.hasNext();) {
-                CustomerOrder order = (CustomerOrder)it.next();
+                CustomerOrder order = (CustomerOrder) it.next();
                 int newDiscount = order.getDiscount() + adjustment;
-                order.setDiscount((newDiscount > 0)? newDiscount : 0);
+                order.setDiscount((newDiscount > 0) ? newDiscount : 0);
             }
         } catch (Exception e) {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public Double getAvgPrice() {
         try {
             return (Double) em.createNamedQuery(
@@ -210,7 +221,7 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public Double getTotalPricePerVendor(int vendorId) {
         try {
             return (Double) em.createNamedQuery(
@@ -221,9 +232,9 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public List<String> locateVendorsByPartialName(String name) {
-        
+
         List<String> names = new ArrayList<>();
         try {
             List vendors = em.createNamedQuery(
@@ -231,7 +242,7 @@ public class RequestBean {
                     .setParameter("name", name)
                     .getResultList();
             for (Iterator iterator = vendors.iterator(); iterator.hasNext();) {
-                Vendor vendor = (Vendor)iterator.next();
+                Vendor vendor = (Vendor) iterator.next();
                 names.add(vendor.getName());
             }
         } catch (Exception e) {
@@ -239,7 +250,7 @@ public class RequestBean {
         }
         return names;
     }
-    
+
     public int countAllItems() {
         int count = 0;
         try {
@@ -262,7 +273,7 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public void removeOrder(Integer orderId) {
         try {
             CustomerOrder order = em.find(CustomerOrder.class, orderId);
@@ -271,17 +282,17 @@ public class RequestBean {
             throw new EJBException(e.getMessage());
         }
     }
-    
+
     public void removeLineItem(Integer partNumber) {
-        try{
+        try {
             Part part = em.find(Part.class, partNumber);
             em.remove(part);
         } catch (Exception e) {
             throw new EJBException(e.getMessage());
         }
-        
+
     }
-    
+
     public String reportVendorsByOrder(Integer orderId) {
         StringBuilder report = new StringBuilder();
         try {
@@ -290,12 +301,12 @@ public class RequestBean {
                     .setParameter("id", orderId)
                     .getResultList();
             for (Iterator iterator = vendors.iterator(); iterator.hasNext();) {
-                Vendor vendor = (Vendor)iterator.next();
+                Vendor vendor = (Vendor) iterator.next();
                 report.append(vendor.getVendorId()).append(' ')
-                .append(vendor.getName()).append(' ')
-                .append(vendor.getContact()).append('\n');
+                        .append(vendor.getName()).append(' ')
+                        .append(vendor.getContact()).append('\n');
             }
-            
+
         } catch (Exception e) {
             throw new EJBException(e);
         }
