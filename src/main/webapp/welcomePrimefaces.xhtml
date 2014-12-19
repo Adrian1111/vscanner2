@@ -6,33 +6,16 @@
       xmlns:p="http://primefaces.org/ui">
 
 
-<script type="text/javascript">
+<ui:composition template="/lineItem-template.xhtml">
+    
 
-    function zoomIt(it) {
+    
+            <ui:define name="title">Dodaj skany sprawy #{orderManager.currentOrder}</ui:define>
+    
         
-        if(it.width === 50 ){
-        it.width *= "10";
-        it.height *= "10";
-        //alert(drawing);
-    }
-    else{
-        it.width = "50";
-        it.height = "50";
-    }
-       
-       
-    }
-</script>
+              <ui:define name="body">
 
-    <f:view contentType="text/html">
-        <h:head>
-            <f:facet name="first">
-                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
-                <title>PrimeFaces</title>
-            </f:facet>
-        </h:head>
-        <ui:define name="title">Dodaj skany sprawy #{orderManager.currentOrder}</ui:define>
-        <h:body>
+       
 
 
 
@@ -105,7 +88,7 @@
                             <h:outputText value="Akcje" />
                         </f:facet>
                         <h:form>
-                            <h:commandLink value="Usuń" actionListener="#{orderManager.removeLineItem}" action="lineItem">
+                            <h:commandLink value="Usuń" actionListener="#{orderManager.removeLineItem}" action="welcomePrimefaces">
                                 <f:param name="deleteItemId" id="deleteItemId" value="#{part.partNumber}" />
                             </h:commandLink>
                         </h:form>
@@ -118,17 +101,6 @@
 
             </h:form>
 
-            <!--            <h:form id="form" enctype="multipart/form-data">
-                            <h:column>
-            
-                                <h:inputFile value="Wrzuć plik" />
-                                <h:inputText value="{orderManager.url}" />
-                                <h:commandButton value="Dodaj obrazek" action="{orderManager.addPicture}"/>
-            
-            
-                            </h:column>
-            
-                        </h:form>-->
 
 
             <h:form>
@@ -140,15 +112,17 @@
 
 
             <h:form>
-                <p:fileUpload fileUploadListener="#{orderManager.handleFileUpload}" mode="advanced" dragDropSupport="false"
+                <p:fileUpload fileUploadListener="#{orderManager.handleFileUpload}" value="#{orderManager.file}" mode="advanced" dragDropSupport="false"
                               update="messages" sizeLimit="1000000" fileLimit="3" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
 
                 <p:growl id="messages" showDetail="true" />
+                <h:inputText required="true" value="#{orderManager.selectedPartNumber}"></h:inputText>
+                <h:commandButton value="Dodaj obrazek" action="{orderManager.addPicture}"/>
             </h:form>
 
-        </h:body>
-
-    </f:view>
+        
+ </ui:define>
+    </ui:composition>
 
 </html>
 

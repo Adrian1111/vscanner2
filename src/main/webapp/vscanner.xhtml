@@ -30,7 +30,7 @@
                         <h:outputText value="Numer sprawy" />
                     </f:facet>
                     <h:form>
-                        <h:commandLink id="order_id_link" action="lineItem">
+                        <h:commandLink id="order_id_link" action="welcomePrimefaces">
                             <h:outputText value="#{order.orderId}" />
                             <f:setPropertyActionListener target="#{orderManager.currentOrder}" value="#{order.orderId}" />
                         </h:commandLink>
