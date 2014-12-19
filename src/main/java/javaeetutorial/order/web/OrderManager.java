@@ -52,7 +52,8 @@ public class OrderManager implements Serializable {
 
     public void handleFileUpload(FileUploadEvent event) {
         try{
-            request.handleFileUpload(event);
+                        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
+            FacesContext.getCurrentInstance().addMessage(null, message);
         }
         catch (Exception e){
             logger.warning("Nie moge uploadowac pliku");

@@ -30,15 +30,6 @@ public class RequestBean {
 
     private static final Logger logger = Logger.getLogger("order.ejb.RequestBean");
 
-    public void handleFileUpload(FileUploadEvent event) {
-        try {
-            FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
-            FacesContext.getCurrentInstance().addMessage(null, message);
-        } catch (Exception e) {
-            throw new EJBException(e.getMessage());
-        }
-
-    }
 
     public void createPart(String partNumber,
             int revision,
