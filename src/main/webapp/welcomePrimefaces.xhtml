@@ -6,16 +6,16 @@
       xmlns:p="http://primefaces.org/ui">
 
 
-<ui:composition template="/lineItem-template.xhtml">
-    
+    <ui:composition template="/lineItem-template.xhtml">
 
-    
-            <ui:define name="title">Dodaj skany sprawy #{orderManager.currentOrder}</ui:define>
-    
-        
-              <ui:define name="body">
 
-       
+
+        <ui:define name="title">Dodaj skany sprawy #{orderManager.currentOrder}</ui:define>
+
+
+        <ui:define name="body">
+
+
 
 
 
@@ -105,25 +105,44 @@
 
             <h:form>
 
-                <br />
                 <h:commandButton value="Powrót do menu" action="vscanner" />
-                
+
             </h:form>
 
 
             <h:form>
-                
+
                 <p:fileUpload fileUploadListener="#{orderManager.handleFileUpload}" value="#{orderManager.file}" mode="advanced" dragDropSupport="false"
                               update="messages" sizeLimit="1000000" fileLimit="3" allowTypes="/(\.|\/)(gif|jpe?g|png)$/" />
 
                 <p:growl id="messages" showDetail="true" />
-                <h:inputText required="true" value="#{orderManager.selectedPartNumber}"></h:inputText>
-                <h:commandButton value="Dodaj obrazek" action="{orderManager.addPicture}"/>
+
+
             </h:form>
 
-              
-                  
- </ui:define>
+<h:form enctype="multipart/form-data">
+    <p:fileUpload
+        mode="advanced"
+        fileUploadListener="#{orderManager.handleFileUpload}"
+        allowTypes="/(\.|\/)(gif|jpg|jpeg|gif|png|PNG|GIF|JPG|JPEG)$/" 
+        auto="true"/>
+</h:form>
+                
+                <h:form>
+
+                           <h:outputText value="Opisz skan" />
+<!--                    <h:inputText required="true" value="#{orderManager.url}"></h:inputText>-->
+                    <h:inputText required="true" value="#{orderManager.selectedPartNumber}"></h:inputText>
+                    <h:commandButton value="Dodaj" action="#{orderManager.addPicture}">
+                        <f:param name="x" id="x" value="#{orderManager.url}" />
+                        <f:param name="y" id="y" value="#{orderManager.selectedPartNumber}" />
+                    </h:commandButton>
+
+                </h:form>
+
+
+
+        </ui:define>
     </ui:composition>
 
 </html>

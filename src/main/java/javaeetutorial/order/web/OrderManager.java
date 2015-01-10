@@ -1,6 +1,11 @@
 package javaeetutorial.order.web;
 
 import java.io.IOException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import org.primefaces.model.StreamedContent;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
@@ -58,6 +63,25 @@ public class OrderManager implements Serializable {
         catch (Exception e){
             logger.warning("Nie moge uploadowac pliku");
     }
+         try {
+            File targetFolder = new File("C:\\serwery\\docs\\projects\\projekty\\persistence\\workspace\\vscanner 1\\src\\main\\webapp\\resources\\images");
+            InputStream inputStream = event.getFile().getInputstream();
+            OutputStream out = new FileOutputStream(new File(targetFolder,
+                    event.getFile().getFileName()));
+            this.url = event.getFile().getFileName();
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = inputStream.read(bytes)) != -1) {
+                out.write(bytes, 0, read);
+            }
+            inputStream.close();
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
     }
     
 
@@ -156,7 +180,7 @@ public class OrderManager implements Serializable {
     public void addPicture() {
         try {
             request.createPart(this.selectedPartNumber, 1, "ABC PART",
-                    new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", null);//this.file.getContents());//"/resources/images/" + this.url);
+                    new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", "/resources/images/" + this.url);//this.file.getContents());//"/resources/images/" + this.url);
         } catch (Exception e) {
             logger.warning("Problem ze stworzeniem propozycji skanu.");
         }
