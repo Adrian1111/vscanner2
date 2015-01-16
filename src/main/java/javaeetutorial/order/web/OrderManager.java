@@ -181,6 +181,7 @@ public class OrderManager implements Serializable {
         try {
             request.createPart(this.selectedPartNumber, 1, "ABC PART",
                     new java.util.Date(), "PARTQWERTYUIOPASXDCFVGBHNJMKL", "/resources/images/" + this.url);//this.file.getContents());//"/resources/images/" + this.url);
+            
         } catch (Exception e) {
             logger.warning("Problem ze stworzeniem propozycji skanu.");
         }
